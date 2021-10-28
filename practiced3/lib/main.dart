@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+
+import 'Home.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+    
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -46,18 +51,44 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  bool isButtonActive = false;
+  late TextEditingController controller = TextEditingController();
+  late TextEditingController controlleremail = TextEditingController();
+    late TextEditingController controllerPassword = TextEditingController();
 
-  void _incrementCounter() {
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController();
+    controlleremail = TextEditingController();
+
+    controller.addListener(login);
+    controlleremail.addListener(login);
+    controllerPassword.addListener(login);
+
+    
+  }
+void login() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      if (controller.text.isNotEmpty &&
+          controlleremail.text.isNotEmpty &&
+          controllerPassword.text.isNotEmpty) {
+        isButtonActive = true;
+      } else {
+        isButtonActive = false;
+      }
     });
   }
+  @override
+  void dispose() {
+    controller.dispose();
+    controlleremail.dispose();
+    super.dispose();
+  }
+
+  List Gender = ["Male", "Female"];
+  String Gender_type = "Male";
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +99,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      // backgroundColor: Colors.lightBlue,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        centerTitle: true,
+        title: Text("Welcome Message"),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -91,23 +125,107 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            Image.network(
+              'https://www.pngitem.com/pimgs/m/626-6265850_group-s-contacts-people-lock-secure-security-password.png',
+              height: 180,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+
+            //  Icon(
+            //             Icons.people_alt,
+            //             size: 80.0,
+            //           ),
+            //           SizedBox(height: 20.0),
+
+            Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: <Widget>[
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'NAME',
+                    ),
+                    controller: controller,
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'EMAIL',
+                      ),
+                      controller: controlleremail),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'PASSWORD',
+                      
+                    ),controller: controllerPassword
+                  ),
+                  SizedBox(
+                    height: 16.0,
+                  ),
+                  DropdownButtonFormField(
+                    value: Gender_type,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        Gender_type = newValue ?? "";
+                      });
+                    },
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                    items:
+                        Gender.map<DropdownMenuItem<String>>((newValue) {
+                      return DropdownMenuItem(
+                        child: Text(newValue),
+                        value: newValue,
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  ElevatedButton(
+                    child: Text('LOGIN',),
+                    style: ElevatedButton.styleFrom(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 92, vertical: 10),
+                        primary: Colors.green,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        textStyle: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    onPressed: !isButtonActive
+                        ? null:() {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => Home(),
+                              ),
+                            );
+                         
+                            controller.clear();
+                            controlleremail.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("SUCCESFULLY SIGN IN",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20)),
+                              // duration: const Duration(seconds: 2),
+                            ));
+                            // validation purpose
+                          }
+                       
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
